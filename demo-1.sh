@@ -1,11 +1,5 @@
 #!/bin/bash
-set -x #echo on
-
-## PREREQ: SET CONTEXTS FOR CLUSTERS
-## PREREQ: Istio and EMCEE already installed and configured
-
-read -p 'CLUSTER1 CONTEXT: ' CTX_CLUSTER1
-read -p 'CLUSTER2 CONTEXT: ' CTX_CLUSTER2
+source init.sh
 
 ## ---
 
@@ -118,12 +112,4 @@ kubectl config use-context $CTX_CLUSTER1
 echo "curl httpbin.bar:8000"
 kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -I http://httpbin.bar:8000/
 
-echo "Cleanup"
-kubectl config use-context $CTX_CLUSTER1
-kubectl delete deploy,svc --all -n foo
-kubectl delete deploy,svc --all -n bar
-kubectl delete ns foo bar
-kubectl config use-context $CTX_CLUSTER2
-kubectl delete deploy,svc --all -n foo
-kubectl delete deploy,svc --all -n bar
-kubectl delete ns foo bar
+source cleanup.sh
