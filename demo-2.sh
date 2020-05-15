@@ -45,5 +45,45 @@ kubectl config use-context $CTX_CLUSTER1
 echo "## curl helloworld:5000"
 kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
 
+kubectl apply -n foo -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: helloworld
+spec:
+  host: helloworld
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: helloworld
+spec:
+  hosts:
+    - helloworld
+  http:
+  - route:
+    - destination:
+        host: helloworld
+        subset: v1
+      weight: 50
+    - destination:
+        host: helloworld
+        subset: v2
+      weight: 50
+EOF
+
+echo "## curl helloworld:5000 several times. You should see 50-50 v1 and v2"
+kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
+kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
+kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
+kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
+kubectl exec -n foo $(kubectl get pod -n foo -l app=sleep -o jsonpath={.items..metadata.name}) -c sleep  -- curl -s http://helloworld:5000/hello
 
 source cleanup.sh
