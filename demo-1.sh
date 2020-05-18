@@ -23,8 +23,8 @@ kubectl apply -n foo -f https://raw.githubusercontent.com/istio/istio/release-1.
 
 echo "## ---"
 
-echo "## Expose httpbin.foo on $CTX_CLUSTER2 by modifying the Service with an annotation"
-kubectl annotate service httpbin -n foo emcee.io/expose='true'
+echo "## Expose httpbin.foo on $CTX_CLUSTER2 by modifying the Service with a label"
+kubectl label service httpbin -n foo emcee.io/expose='true'
 
 sleep 20s
 
@@ -51,24 +51,8 @@ kubectl label namespace bar istio-injection=enabled
 kubectl apply -n bar -f https://raw.githubusercontent.com/istio/istio/release-1.5/samples/httpbin/httpbin.yaml
 
 
-echo "## Expose httpbin.bar on $CTX_CLUSTER2 by modifying the Service with an annotation"
-kubectl apply -n bar -f - <<EOF
-apiVersion: v1
-kind: Service
-metadata:
-  name: httpbin
-  labels:
-    app: httpbin
-  annotations:
-    emcee.io/expose: "true"
-spec:
-  ports:
-  - name: http
-    port: 8000
-    targetPort: 80
-  selector:
-    app: httpbin
-EOF
+echo "## Expose httpbin.bar on $CTX_CLUSTER2 by modifying the Service with a label"
+kubectl label service httpbin -n bar emcee.io/expose='true'
 
 sleep 20s
 
