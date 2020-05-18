@@ -20,8 +20,8 @@ kubectl apply -n foo -f https://raw.githubusercontent.com/istio/istio/release-1.
 
 sleep 20s
 
-echo "## Expose tcp-echo.foo on $CTX_CLUSTER2 by modifying the Service with an annotation"
-kubectl annotate service helloworld -n foo emcee.io/expose='true'
+echo "## Expose helloworld.foo on $CTX_CLUSTER2 by modifying the Service with a label"
+kubectl label service helloworld -n foo emcee.io/expose='true'
 
 echo "## Test sleep.foo (cluster1) -> tcp-echo.foo (cluster2) "
 kubectl config use-context $CTX_CLUSTER1
